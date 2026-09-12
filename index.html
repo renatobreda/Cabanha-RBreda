@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Ovinos - Sítio</title>
+    <style>
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+        body { font-family: Arial, sans-serif; margin: 0; background-color: #f4f6f8; color: #333; }
+        header { background-color: #2e7d32; color: white; padding: 1rem; text-align: center; }
+        .container { padding: 1rem; max-width: 1150px; margin: 0 auto; }
+        .card { background: white; padding: 1.5rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        h2 { margin-top: 0; color: #2e7d32; font-size: 1.2rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-row { display: flex; gap: 10px; }
+        .form-row .form-group { flex: 1; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        input, select { width: 100%; padding: 0.6rem; border: 1px solid #ccc; border-radius: 4px; }
+        
+        /* Botões */
+        .botoes-form { display: flex; gap: 10px; }
+        button.btn-salvar { background-color: #2e7d32; color: white; border: none; padding: 0.8rem 1.2rem; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; }
+        button.btn-salvar:hover { background-color: #1b5e20; }
+        
+        button.btn-cancelar { background-color: #757575; color: white; border: none; padding: 0.8rem 1.2rem; border-radius: 4px; cursor: pointer; font-weight: bold; display: none; }
+        button.btn-cancelar:hover { background-color: #616161; }
+
+        .btn-pesagem {
+            background-color: #f57c00;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+        .btn-pesagem:hover { background-color: #e65100; }
+
+        .btn-sanitario {
+            background-color: #0288d1;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+        .btn-sanitario:hover { background-color: #01579b; }
+
+        .btn-editar {
+            background-color: #7b1fa2;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+        .btn-editar:hover { background-color: #4a148c; }
+
+        .btn-excluir {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        .btn-excluir:hover { background-color: #b71c1c; }
+
+        /* Campo de busca */
+        .busca-container { margin-bottom: 1rem; }
+        .busca-input { 
+            width: 100%; 
+            padding: 0.75rem; 
+            border: 2px solid #2e7d32; 
+            border-radius: 6px; 
+            font-size: 0.95rem;
+            background-color: #f9f9f9;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #ddd; vertical-align: middle; }
+        th { background-color: #e8f5e9; color: #2e7d32; }
+        
+        /* Fotos na Tabela */
+        .img-thumb {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .img-thumb:hover { transform: scale(1.08); }
+        .sem-foto {
+            width: 50px;
+            height: 50px;
+            background-color: #eee;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        .preview-container { margin-top: 0.5rem; display: none; align-items: center; gap: 10px; }
+        .preview-img { width: 60px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #ccc; }
+
+        .badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .macho { background: #e3f2fd; color: #1565c0; }
+        .femea { background: #fce4ec; color: #c2185b; }
+        .sem-resultados { text-align: center; color: #777; font-style: italic; padding: 1.5rem 0; }
+        .acoes-col { white-space: nowrap; text-align: center; }
+
+        /* Badges do Famacha */
+        .famacha-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+        .famacha-1 { background-color: #c8e6c9; color: #2e7d32; }
+        .famacha-2 { background-color: #dbedc8; color: #33691e; }
+        .famacha-3 { background-color: #fff9c4; color: #f57f17; }
+        .famacha-4 { background-color: #ffe0b2; color: #e65100; }
+        .famacha-5 { background-color: #ffcdd2; color: #b71c1c; }
+
+        /* Modais */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-conteudo-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            max-width: 620px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        .modal-conteudo-img {
+            max-width: 90%;
+            max-height: 85vh;
+            border-radius: 8px;
+        }
+        .modal-fechar {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: #333;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .modal-fechar-img {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-excluir-item {
+            background: none;
+            border: none;
+            color: #d32f2f;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .card-desempenho {
+            background-color: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            border-radius: 6px;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-around;
+            text-align: center;
+        }
+        .item-desempenho { display: flex; flex-direction: column; }
+        .label-desempenho { font-size: 0.75rem; color: #2e7d32; text-transform: uppercase; font-weight: bold; }
+        .valor-desempenho { font-size: 1.1rem; font-weight: bold; color: #1b5e20; margin-top: 0.2rem; }
+        .valor-negativo { color: #c62828 !important; }
+
+        .box-sanitario {
+            background: #f4f9fc;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            border: 1px solid #e1f5fe;
+        }
+
+        .filiacao-txt {
+            font-size: 0.85rem;
+            color: #555;
+        }
+        .sub-nome {
+            font-size: 0.85rem;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Manejo de Ovinos</h1>
+</header>
+
+<div class="container">
+    <!-- Formulário de Cadastro / Edição -->
+    <div class="card">
+        <h2 id="tituloForm">Cadastrar Novo Animal</h2>
+        <form id="formAnimal">
+            <input type="hidden" id="animalId">
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="brinco">Número do Brinco/Identificação</label>
+                    <input type="text" id="brinco" required placeholder="Ex: 001">
+                </div>
+                <div class="form-group">
+                    <label for="nome">Nome do Animal (Opcional)</label>
+                    <input type="text" id="nome" placeholder="Ex: Mimosa, Barão, Estrela">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="sexo">Sexo</label>
+                    <select id="sexo" required>
+                        <option value="Fêmea">Fêmea</option>
+                        <option value="Macho">Macho</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="raca">Raça</label>
+                    <input type="text" id="raca" placeholder="Ex: Santa Inês, Dorper, Mestiço">
+                </div>
+            </div>
+
+            <!-- Campos de Genealogia / Paternidade -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="pai">Pai (Reprodutor)</label>
+                    <select id="pai">
+                        <option value="">-- Selecionar Pai --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mae">Mãe (Matriz)</label>
+                    <select id="mae">
+                        <option value="">-- Selecionar Mãe --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nascimento">Data de Nascimento</label>
+                    <input type="date" id="nascimento">
+                </div>
+                <div class="form-group">
+                    <label for="peso">Peso Inicial (kg)</label>
+                    <input type="number" id="peso" step="0.1" placeholder="Ex: 35.5">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="foto" id="labelFoto">Foto do Animal</label>
+                <input type="file" id="foto" accept="image/*">
+                <div id="previewContainer" class="preview-container">
+                    <img id="previewImg" class="preview-img" src="" alt="Foto atual">
+                    <span style="font-size:0.85rem; color:#666;">Foto atual salva (envie outra apenas se quiser trocar)</span>
+                </div>
+            </div>
+            
+            <div class="botoes-form">
+                <button type="submit" class="btn-salvar" id="btnSalvar">Salvar Animal</button>
+                <button type="button" class="btn-cancelar" id="btnCancelar" onclick="limparFormulario()">Cancelar Edição</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de Animais com Busca -->
+    <div class="card">
+        <h2>Rebanho Cadastrado</h2>
+        
+        <div class="busca-container">
+            <input 
+                type="text" 
+                id="campoBusca" 
+                class="busca-input" 
+                placeholder="🔍 Buscar por brinco, nome, raça ou filiação..."
+            >
+        </div>
+
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Foto</th>
+                        <th>Brinco / Nome</th>
+                        <th>Sexo</th>
+                        <th>Raça</th>
+                        <th>Pai / Mãe</th>
+                        <th>Nascimento</th>
+                        <th>Último Peso</th>
+                        <th style="text-align: center;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaAnimais">
+                    <!-- Linhas inseridas via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Foto Ampliada -->
+<div id="modalFoto" class="modal" onclick="fecharModalFoto()">
+    <span class="modal-fechar-img" onclick="fecharModalFoto()">&times;</span>
+    <img id="imgModal" class="modal-conteudo-img" src="" alt="Foto Ampliada">
+</div>
+
+<!-- Modal para Gerenciamento de Pesagens -->
+<div id="modalPesagem" class="modal">
+    <div class="modal-conteudo-box">
+        <span class="modal-fechar" onclick="fecharModalPesagem()">&times;</span>
+        <h3 id="tituloModalPesagem" style="color:#2e7d32; margin-top:0;">Histórico de Pesagens</h3>
+        
+        <div id="cardDesempenho" class="card-desempenho">
+            <div class="item-desempenho">
+                <span class="label-desempenho">Ganho Médio/Dia</span>
+                <span id="valGmd" class="valor-desempenho">-</span>
+            </div>
+            <div class="item-desempenho">
+                <span class="label-desempenho">Ganho Total</span>
+                <span id="valGanhoTotal" class="valor-desempenho">-</span>
+            </div>
+            <div class="item-desempenho">
+                <span class="label-desempenho">Período</span>
+                <span id="valDias" class="valor-desempenho">-</span>
+            </div>
+        </div>
+
+        <form id="formNovaPesagem" style="background:#f9f9f9; padding:1rem; border-radius:6px; margin-bottom:1rem;">
+            <input type="hidden" id="pesagemAnimalId">
+            <div class="form-group">
+                <label for="novaDataPesagem">Data da Pesagem</label>
+                <input type="date" id="novaDataPesagem" required>
+            </div>
+            <div class="form-group">
+                <label for="novoPeso">Peso (kg)</label>
+                <input type="number" id="novoPeso" step="0.1" required placeholder="Ex: 42.0">
+            </div>
+            <button type="submit" class="btn-salvar" style="padding:0.6rem;">+ Adicionar Pesagem</button>
+        </form>
+
+        <h4>Histórico Registrado</h4>
+        <table style="font-size:0.9rem;">
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Peso</th>
+                    <th style="text-align:center;">Ação</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaHistoricoPesagens">
+                <!-- Linhas inseridas via JS -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal para Controle Sanitário (Vacinas e Vermífugos / Famacha) -->
+<div id="modalSanitario" class="modal">
+    <div class="modal-conteudo-box">
+        <span class="modal-fechar" onclick="fecharModalSanitario()">&times;</span>
+        <h3 id="tituloModalSanitario" style="color:#0288d1; margin-top:0;">Controle Sanitário & Famacha</h3>
+        
+        <form id="formNovoSanitario" class="box-sanitario">
+            <input type="hidden" id="sanitarioAnimalId">
+            
+            <div class="form-group">
+                <label for="tiposanitario">Tipo de Manejo</label>
+                <select id="tiposanitario" required>
+                    <option value="Vermífugo">Vermífugo</option>
+                    <option value="Vacina">Vacina</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="groupFamacha">
+                <label for="grauFamacha">Grau Famacha© (Coloração da Mucosa Ocular)</label>
+                <select id="grauFamacha">
+                    <option value="">-- Não Avaliado --</option>
+                    <option value="1">Grau 1 (Vermelho Vivo - Normal / Resiliente)</option>
+                    <option value="2">Grau 2 (Rosa Vermelho - Desejável)</option>
+                    <option value="3">Grau 3 (Rosa - Atenção / Avaliar Tratamento)</option>
+                    <option value="4">Grau 4 (Rosa Pálido - Anêmico / Tratar)</option>
+                    <option value="5">Grau 5 (Branco - Severo / Tratamento Urgente)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="nomeSanitario" id="lblNomeSanitario">Nome do Vermífugo / Princípio Ativo</label>
+                <input type="text" id="nomeSanitario" placeholder="Ex: Ivomec, Albendazol, Clofantel">
+            </div>
+            <div class="form-group">
+                <label for="dataAplicacao">Data da Aplicação / Avaliação</label>
+                <input type="date" id="dataAplicacao" required>
+            </div>
+            <div class="form-group">
+                <label for="dataReforco">Próxima Dose / Repetição (Opcional)</label>
+                <input type="date" id="dataReforco">
+            </div>
+            <button type="submit" class="btn-sanitario" style="width:100%; padding:0.6rem; font-size:0.95rem;">+ Registrar Aplicação</button>
+        </form>
+
+        <h4>Histórico Sanitário Registrado</h4>
+        <table style="font-size:0.85rem;">
+            <thead>
+                <tr>
+                    <th>Tipo</th>
+                    <th>Famacha</th>
+                    <th>Produto</th>
+                    <th>Data</th>
+                    <th>Próxima Dose</th>
+                    <th style="text-align:center;">Ação</th>
+                </tr>
+            </thead>
+            <tbody id="tabelaHistoricoSanitario">
+                <!-- Linhas inseridas via JS -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const form = document.getElementById('formAnimal');
+    const tabela = document.getElementById('tabelaAnimais');
+    const campoBusca = document.getElementById('campoBusca');
+    const animalIdInput = document.getElementById('animalId');
+    const tituloForm = document.getElementById('tituloForm');
+    const btnSalvar = document.getElementById('btnSalvar');
+    const btnCancelar = document.getElementById('btnCancelar');
+    const previewContainer = document.getElementById('previewContainer');
+    const previewImg = document.getElementById('previewImg');
+    
+    // Selects de Paternidade
+    const selectPai = document.getElementById('pai');
+    const selectMae = document.getElementById('mae');
+
+    // Modais
+    const modalFoto = document.getElementById('modalFoto');
+    const imgModal = document.getElementById('imgModal');
+    
+    // Elementos Pesagem
+    const modalPesagem = document.getElementById('modalPesagem');
+    const pesagemAnimalId = document.getElementById('pesagemAnimalId');
+    const formNovaPesagem = document.getElementById('formNovaPesagem');
+    const tabelaHistoricoPesagens = document.getElementById('tabelaHistoricoPesagens');
+    const valGmd = document.getElementById('valGmd');
+    const valGanhoTotal = document.getElementById('valGanhoTotal');
+    const valDias = document.getElementById('valDias');
+
+    // Elementos Sanitários
+    const modalSanitario = document.getElementById('modalSanitario');
+    const sanitarioAnimalId = document.getElementById('sanitarioAnimalId');
+    const formNovoSanitario = document.getElementById('formNovoSanitario');
+    const tipoSanitarioSelect = document.getElementById('tiposanitario');
+    const groupFamacha = document.getElementById('groupFamacha');
+    const grauFamachaSelect = document.getElementById('grauFamacha');
+    const lblNomeSanitario = document.getElementById('lblNomeSanitario');
+    const inputNomeSanitario = document.getElementById('nomeSanitario');
+    const tabelaHistoricoSanitario = document.getElementById('tabelaHistoricoSanitario');
+
+    let rebanho = JSON.parse(localStorage.getItem('rebanho_sitio')) || [];
+    let fotoAtualEdicao = null;
+
+    // Atualiza os dropdowns de Pai e Mãe com os animais cadastrados
+    function atualizarSelectsPais(animalIdAtual = null) {
+        const valorPaiSelecionado = selectPai.value;
+        const valorMaeSelecionado = selectMae.value;
+
+        selectPai.innerHTML = '<option value="">-- Selecionar Pai --</option>';
+        selectMae.innerHTML = '<option value="">-- Selecionar Mãe --</option>';
+
+        rebanho.forEach(animal => {
+            if (animalIdAtual && animal.id == animalIdAtual) return;
+
+            const opt = document.createElement('option');
+            opt.value = animal.brinco;
+            const rotuloNome = animal.nome ? ` "${animal.nome}"` : '';
+            opt.textContent = `Brinco ${animal.brinco}${rotuloNome}${animal.raca ? ' (' + animal.raca + ')' : ''}`;
+
+            if (animal.sexo === 'Macho') {
+                selectPai.appendChild(opt);
+            } else if (animal.sexo === 'Fêmea') {
+                selectMae.appendChild(opt);
+            }
+        });
+
+        selectPai.value = valorPaiSelecionado;
+        selectMae.value = valorMaeSelecionado;
+    }
+
+    tipoSanitarioSelect.addEventListener('change', (e) => {
+        if (e.target.value === 'Vacina') {
+            groupFamacha.style.display = 'none';
+            lblNomeSanitario.innerText = "Nome da Vacina";
+            inputNomeSanitario.placeholder = "Ex: Clostridiose, Raiva, Ectima";
+            inputNomeSanitario.required = true;
+        } else {
+            groupFamacha.style.display = 'block';
+            lblNomeSanitario.innerText = "Nome do Vermífugo / Princípio Ativo (Opcional)";
+            inputNomeSanitario.placeholder = "Ex: Ivomec, Albendazol, Clofantel";
+            inputNomeSanitario.required = false;
+        }
+    });
+
+    function otimizarImagem(file, larguraMaxima = 1000, qualidade = 0.75) {
+        return new Promise((resolve) => {
+            const leitor = new FileReader();
+            leitor.onload = function (evento) {
+                const img = new Image();
+                img.onload = function () {
+                    const canvas = document.createElement('canvas');
+                    let largura = img.width;
+                    let altura = img.height;
+
+                    if (largura > larguraMaxima) {
+                        altura = Math.round((altura * larguraMaxima) / largura);
+                        largura = larguraMaxima;
+                    }
+
+                    canvas.width = largura;
+                    canvas.height = altura;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, largura, altura);
+                    const dataUrl = canvas.toDataURL('image/jpeg', qualidade);
+                    resolve(dataUrl);
+                };
+                img.src = evento.target.result;
+            };
+            leitor.readAsDataURL(file);
+        });
+    }
+
+    function getPesagensOrdenadas(animal) {
+        if (!animal.pesagens || animal.pesagens.length === 0) return [];
+        return [...animal.pesagens].sort((a, b) => {
+            const dataA = new Date(a.data + 'T00:00:00').getTime();
+            const dataB = new Date(b.data + 'T00:00:00').getTime();
+            if (dataA !== dataB) return dataA - dataB;
+            return (a.id || 0) - (b.id || 0);
+        });
+    }
+
+    function getUltimaPesagem(animal) {
+        const pesagens = getPesagensOrdenadas(animal);
+        return pesagens.length > 0 ? pesagens[pesagens.length - 1] : null;
+    }
+
+    function getUltimoPesoInfo(animal) {
+        const ultima = getUltimaPesagem(animal);
+        return ultima ? `${ultima.peso} kg` : '-';
+    }
+
+    function calcularDesempenho(animal) {
+        const pesagens = getPesagensOrdenadas(animal);
+        
+        if (pesagens.length < 2) {
+            valGmd.innerText = 'Necessita de 2+ pesos';
+            valGanhoTotal.innerText = '-';
+            valDias.innerText = '-';
+            valGmd.className = 'valor-desempenho';
+            valGanhoTotal.className = 'valor-desempenho';
+            return;
+        }
+
+        const primeira = pesagens[0];
+        const ultima = pesagens[pesagens.length - 1];
+
+        const d1 = new Date(primeira.data + 'T00:00:00');
+        const d2 = new Date(ultima.data + 'T00:00:00');
+        
+        const diferencaMs = d2.getTime() - d1.getTime();
+        const dias = Math.round(diferencaMs / (1000 * 60 * 60 * 24));
+        
+        const pesoInicial = parseFloat(primeira.peso);
+        const pesoFinal = parseFloat(ultima.peso);
+        const ganhoTotal = pesoFinal - pesoInicial;
+
+        if (dias <= 0) {
+            valGmd.innerText = 'Mesma data';
+            valGanhoTotal.innerText = `${ganhoTotal.toFixed(1)} kg`;
+            valDias.innerText = '0 dias';
+            return;
+        }
+
+        const gmdKg = ganhoTotal / dias;
+        const gmdGramas = Math.round(gmdKg * 1000);
+
+        valGmd.innerText = gmdGramas >= 0 ? `+${gmdGramas} g/dia` : `${gmdGramas} g/dia`;
+        valGanhoTotal.innerText = ganhoTotal >= 0 ? `+${ganhoTotal.toFixed(1)} kg` : `${ganhoTotal.toFixed(1)} kg`;
+        valDias.innerText = `${dias} dias`;
+
+        if (gmdGramas < 0) {
+            valGmd.className = 'valor-desempenho valor-negativo';
+            valGanhoTotal.className = 'valor-desempenho valor-negativo';
+        } else {
+            valGmd.className = 'valor-desempenho';
+            valGanhoTotal.className = 'valor-desempenho';
+        }
+    }
+
+    function atualizarTabela(filtro = '') {
+        tabela.innerHTML = '';
+        const termoFiltro = filtro.toLowerCase().trim();
+
+        const animaisFiltrados = rebanho.filter(animal => {
+            const brincoOk = animal.brinco.toLowerCase().includes(termoFiltro);
+            const nomeOk = (animal.nome || '').toLowerCase().includes(termoFiltro);
+            const racaOk = (animal.raca || '').toLowerCase().includes(termoFiltro);
+            const paiOk = (animal.pai || '').toLowerCase().includes(termoFiltro);
+            const maeOk = (animal.mae || '').toLowerCase().includes(termoFiltro);
+            return brincoOk || nomeOk || racaOk || paiOk || maeOk;
+        });
+
+        if (animaisFiltrados.length === 0) {
+            tabela.innerHTML = `
+                <tr>
+                    <td colspan="8" class="sem-resultados">Nenhum carneiro encontrado.</td>
+                </tr>
+            `;
+            return;
+        }
+
+        animaisFiltrados.forEach((animal) => {
+            const indexOriginal = rebanho.findIndex(a => a.id === animal.id);
+            const tr = document.createElement('tr');
+            const classeBadge = animal.sexo === 'Macho' ? 'macho' : 'femea';
+            
+            const htmlFoto = animal.foto 
+                ? `<img src="${animal.foto}" class="img-thumb" onclick="abrirModalFoto('${animal.id}')" title="Clique para ampliar">`
+                : `<div class="sem-foto">Sem foto</div>`;
+
+            const txtPai = animal.pai ? `Pai: ${animal.pai}` : '';
+            const txtMae = animal.mae ? `Mãe: ${animal.mae}` : '';
+            const txtFiliacao = [txtPai, txtMae].filter(Boolean).join('<br>') || '-';
+            const htmlNome = animal.nome ? `<div class="sub-nome">${animal.nome}</div>` : '';
+
+            tr.innerHTML = `
+                <td>${htmlFoto}</td>
+                <td><strong>${animal.brinco}</strong>${htmlNome}</td>
+                <td><span class="badge ${classeBadge}">${animal.sexo}</span></td>
+                <td>${animal.raca || '-'}</td>
+                <td class="filiacao-txt">${txtFiliacao}</td>
+                <td>${animal.nascimento ? new Date(animal.nascimento + 'T00:00:00').toLocaleDateString('pt-BR') : '-'}</td>
+                <td><strong>${getUltimoPesoInfo(animal)}</strong></td>
+                <td class="acoes-col">
+                    <button class="btn-pesagem" onclick="abrirModalPesagem('${animal.id}')">⚖️ Pesagem</button>
+                    <button class="btn-sanitario" onclick="abrirModalSanitario('${animal.id}')">💉 Vacinas & Famacha</button>
+                    <button class="btn-editar" onclick="prepararEdicao(${indexOriginal})">✏️ Editar</button>
+                    <button class="btn-excluir" onclick="excluirAnimal(${indexOriginal})">🗑️ Excluir</button>
+                </td>
+            `;
+            tabela.appendChild(tr);
+        });
+
+        atualizarSelectsPais();
+    }
+
+    // Modal de Foto
+    function abrirModalFoto(idAnimal) {
+        const animal = rebanho.find(a => a.id == idAnimal);
+        if (animal && animal.foto) {
+            imgModal.src = animal.foto;
+            modalFoto.style.display = 'flex';
+        }
+    }
+    function fecharModalFoto() {
+        modalFoto.style.display = 'none';
+        imgModal.src = '';
+    }
+
+    // Modal de Pesagem
+    function abrirModalPesagem(idAnimal) {
+        const animal = rebanho.find(a => a.id == idAnimal);
+        if (!animal) return;
+
+        pesagemAnimalId.value = animal.id;
+        const identAnimal = animal.nome ? `Brinco ${animal.brinco} (${animal.nome})` : `Brinco ${animal.brinco}`;
+        document.getElementById('tituloModalPesagem').innerText = `Pesagens: ${identAnimal}`;
+        document.getElementById('novaDataPesagem').value = new Date().toISOString().split('T')[0];
+        document.getElementById('novoPeso').value = '';
+
+        calcularDesempenho(animal);
+        atualizarTabelaHistorico(animal);
+        modalPesagem.style.display = 'flex';
+    }
+
+    function fecharModalPesagem() {
+        modalPesagem.style.display = 'none';
+        pesagemAnimalId.value = '';
+    }
+
+    function atualizarTabelaHistorico(animal) {
+        tabelaHistoricoPesagens.innerHTML = '';
+
+        if (!animal.pesagens || animal.pesagens.length === 0) {
+            tabelaHistoricoPesagens.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888;">Nenhuma pesagem registrada.</td></tr>`;
+            return;
+        }
+
+        const pesagensOrdenadas = [...animal.pesagens].sort((a, b) => {
+            const dataA = new Date(a.data + 'T00:00:00').getTime();
+            const dataB = new Date(b.data + 'T00:00:00').getTime();
+            if (dataA !== dataB) return dataB - dataA;
+            return (b.id || 0) - (a.id || 0);
+        });
+
+        pesagensOrdenadas.forEach((p) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${new Date(p.data + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
+                <td><strong>${p.peso} kg</strong></td>
+                <td style="text-align:center;">
+                    <button class="btn-excluir-item" onclick="excluirPesagem('${animal.id}', '${p.id}')" title="Excluir Pesagem">🗑️</button>
+                </td>
+            `;
+            tabelaHistoricoPesagens.appendChild(tr);
+        });
+    }
+
+    formNovaPesagem.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const idAnimal = pesagemAnimalId.value;
+        const animal = rebanho.find(a => a.id == idAnimal);
+
+        if (animal) {
+            if (!animal.pesagens) animal.pesagens = [];
+
+            const novaPesagem = {
+                id: Date.now(),
+                data: document.getElementById('novaDataPesagem').value,
+                peso: document.getElementById('novoPeso').value
+            };
+
+            animal.pesagens.push(novaPesagem);
+            localStorage.setItem('rebanho_sitio', JSON.stringify(rebanho));
+            
+            calcularDesempenho(animal);
+            atualizarTabelaHistorico(animal);
+            atualizarTabela(campoBusca.value);
+            document.getElementById('novoPeso').value = '';
+        }
+    });
+
+    function excluirPesagem(idAnimal, idPesagem) {
+        const animal = rebanho.find(a => a.id == idAnimal);
+        if (animal && animal.pesagens) {
+            animal.pesagens = animal.pesagens.filter(p => p.id != idPesagem);
+            localStorage.setItem('rebanho_sitio', JSON.stringify(rebanho));
+            calcularDesempenho(animal);
+            atualizarTabelaHistorico(animal);
+            atualizarTabela(campoBusca.value);
+        }
+    }
+
+    // Modal Sanitário
+    function abrirModalSanitario(idAnimal) {
+        const animal = rebanho.find(a => a.id == idAnimal);
+        if (!animal) return;
+
+        sanitarioAnimalId.value = animal.id;
+        const identAnimal = animal.nome ? `Brinco ${animal.brinco} (${animal.nome})` : `Brinco ${animal.brinco}`;
+        document.getElementById('tituloModalSanitario').innerText = `Manejo Sanitário: ${identAnimal}`;
+        document.getElementById('dataAplicacao').value = new Date().toISOString().split('T')[0];
+        document.getElementById('nomeSanitario').value = '';
+        document.getElementById('dataReforco').value = '';
+        grauFamachaSelect.value = '';
+        tipoSanitarioSelect.value = 'Vermífugo';
+        
+        groupFamacha.style.display = 'block';
+        lblNomeSanitario.innerText = "Nome do Vermífugo / Princípio Ativo (Opcional)";
+        inputNomeSanitario.placeholder = "Ex: Ivomec, Albendazol, Clofantel";
+        inputNomeSanitario.required = false;
+
+        atualizarTabelaSanitario(animal);
+        modalSanitario.style.display = 'flex';
+    }
+
+    function fecharModalSanitario() {
+        modalSanitario.style.display = 'none';
+        sanitarioAnimalId.value = '';
+    }
+
+    function atualizarTabelaSanitario(animal) {
+        tabelaHistoricoSanitario.innerHTML = '';
+
+        if (!animal.sanitario || animal.sanitario.length === 0) {
+            tabelaHistoricoSanitario.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888;">Nenhum registro sanitário encontrado.</td></tr>`;
+            return;
+        }
+
+        const registrosOrdenados = [...animal.sanitario].sort((a, b) => new Date(b.dataAplicacao) - new Date(a.dataAplicacao));
+
+        registrosOrdenados.forEach((s) => {
+            const tr = document.createElement('tr');
+            const dataReforcoTxt = s.dataReforco 
+                ? new Date(s.dataReforco + 'T00:00:00').toLocaleDateString('pt-BR') 
+                : '-';
+
+            const tagTipo = s.tipo === 'Vacina' 
+                ? `<span style="background:#e1f5fe; color:#0288d1; padding:2px 6px; border-radius:4px; font-weight:bold;">Vacina</span>`
+                : `<span style="background:#fff3e0; color:#ef6c00; padding:2px 6px; border-radius:4px; font-weight:bold;">Vermífugo</span>`;
+
+            const htmlFamacha = s.famacha 
+                ? `<span class="famacha-badge famacha-${s.famacha}">Grau ${s.famacha}</span>` 
+                : '-';
+
+            tr.innerHTML = `
+                <td>${tagTipo}</td>
+                <td>${htmlFamacha}</td>
+                <td><strong>${s.nome || '-'}</strong></td>
+                <td>${new Date(s.dataAplicacao + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
+                <td>${dataReforcoTxt}</td>
+                <td style="text-align:center;">
+                    <button class="btn-excluir-item" onclick="excluirSanitario('${animal.id}', '${s.id}')" title="Excluir Registro">🗑️</button>
+                </td>
+            `;
+            tabelaHistoricoSanitario.appendChild(tr);
+        });
+    }
+
+    formNovoSanitario.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const idAnimal = sanitarioAnimalId.value;
+        const animal = rebanho.find(a => a.id == idAnimal);
+
+        if (animal) {
+            if (!animal.sanitario) animal.sanitario = [];
+
+            const novoRegistro = {
+                id: Date.now(),
+                tipo: tipoSanitarioSelect.value,
+                famacha: grauFamachaSelect.value || null,
+                nome: document.getElementById('nomeSanitario').value,
+                dataAplicacao: document.getElementById('dataAplicacao').value,
+                dataReforco: document.getElementById('dataReforco').value
+            };
+
+            animal.sanitario.push(novoRegistro);
+            localStorage.setItem('rebanho_sitio', JSON.stringify(rebanho));
+            
+            atualizarTabelaSanitario(animal);
+            document.getElementById('nomeSanitario').value = '';
+            document.getElementById('dataReforco').value = '';
+            grauFamachaSelect.value = '';
+            document.getElementById('dataAplicacao').value = new Date().toISOString().split('T')[0];
+        }
+    });
+
+    function excluirSanitario(idAnimal, idRegistro) {
+        const animal = rebanho.find(a => a.id == idAnimal);
+        if (animal && animal.sanitario) {
+            animal.sanitario = animal.sanitario.filter(s => s.id != idRegistro);
+            localStorage.setItem('rebanho_sitio', JSON.stringify(rebanho));
+            atualizarTabelaSanitario(animal);
+        }
+    }
+
+    // Formulário de Cadastro/Edição Principal
+    function prepararEdicao(index) {
+        const animal = rebanho[index];
+        
+        atualizarSelectsPais(animal.id);
+
+        animalIdInput.value = animal.id;
+        document.getElementById('brinco').value = animal.brinco;
+        document.getElementById('nome').value = animal.nome || '';
+        document.getElementById('sexo').value = animal.sexo;
+        document.getElementById('raca').value = animal.raca || '';
+        selectPai.value = animal.pai || '';
+        selectMae.value = animal.mae || '';
+        document.getElementById('nascimento').value = animal.nascimento || '';
+        
+        const ultimaPesagem = getUltimaPesagem(animal);
+        document.getElementById('peso').value = ultimaPesagem ? ultimaPesagem.peso : '';
+
+        fotoAtualEdicao = animal.foto || null;
+
+        if (animal.foto) {
+            previewImg.src = animal.foto;
+            previewContainer.style.display = 'flex';
+        } else {
+            previewContainer.style.display = 'none';
+        }
+
+        const tituloAnimal = animal.nome ? `${animal.brinco} (${animal.nome})` : animal.brinco;
+        tituloForm.innerText = `Editar Carneiro: ${tituloAnimal}`;
+        btnSalvar.innerText = "Atualizar Animal";
+        btnCancelar.style.display = "block";
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function limparFormulario() {
+        form.reset();
+        animalIdInput.value = '';
+        fotoAtualEdicao = null;
+        previewContainer.style.display = 'none';
+        
+        tituloForm.innerText = "Cadastrar Novo Animal";
+        btnSalvar.innerText = "Salvar Animal";
+        btnCancelar.style.display = "none";
+        
+        atualizarSelectsPais();
+    }
+
+    function excluirAnimal(index) {
+        const animal = rebanho[index];
+        const identAnimal = animal.nome ? `"${animal.nome}" (Brinco ${animal.brinco})` : `brinco "${animal.brinco}"`;
+        const confirmacao = confirm(`Tem certeza que deseja remover o animal ${identAnimal}?`);
+        
+        if (confirmacao) {
+            if (animalIdInput.value == animal.id) {
+                limparFormulario();
+            }
+
+            rebanho.splice(index, 1);
+            localStorage.setItem('rebanho_sitio', JSON.stringify(rebanho));
+            atualizarTabela(campoBusca.value);
+        }
+    }
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const idEditando = animalIdInput.value;
+        const arquivoFoto = document.getElementById('foto').files[0];
+        const pesoDigitado = document.getElementById('peso').value;
+        const dataNascimento = document.getElementById('nascimento').value;
+        
+        const dataPesagemInicial = dataNascimento ? dataNascimento : new Date().toISOString().split('T')[0];
+
+        let fotoFinal = fotoAtualEdicao;
+
+        if (arquivoFoto) {
+            try {
+                fotoFinal = await otimizarImagem(arquivoFoto);
+            } catch (err) {
+                alert("Erro ao processar a foto. Tente enviar outra imagem.");
+                return;
+            }
+        }
+
+        if (idEditando) {
+            const index = rebanho.findIndex(a => a.id == idEditando);
+            if (index !== -1) {
+                rebanho[index].brinco = document.getElementById('brinco').value;
+                rebanho[index].nome = document.getElementById('nome').value;
+                rebanho[index].sexo = document.getElementById('sexo').value;
+                rebanho[index].raca = document.getElementById('raca').value;
+                rebanho[index].pai = selectPai.value;
+                rebanho[index].mae = selectMae.value;
+                rebanho[index].nascimento = dataNascimento;
+                rebanho[index].foto = fotoFinal;
+
+                if (pesoDigitado) {
+                    if (!rebanho[index].pesagens) rebanho[index].pesagens = [];
+                    
+                    const ultima = getUltimaPesagem(rebanho[index]);
+                    if (!ultima || ultima.peso != pesoDigitado) {
+                        rebanho[index].pesagens.push({
+                            id: Date.now(),
+                            data: dataPesagemInicial,
+                            peso: pesoDigitado
+                        });
+                    }
+                }
+            }
+        } else {
+            const novoAnimal = {
+                id: Date.now(),
+                brinco: document.getElementById('brinco').value,
+                nome: document.getElementById('nome').value,
+                sexo: document.getElementById('sexo').value,
+                raca: document.getElementById('raca').value,
+                pai: selectPai.value,
+                mae: selectMae.value,
+                nascimento: dataNascimento,
+                foto: fotoFinal,
+                pesagens: pesoDigitado ? [{ id: Date.now(), data: dataPesagemInicial, peso: pesoDigitado }] : [],
+                sanitario: []
+            };
+            rebanho.push(novoAnimal);
+        }
+
+        try {
+            localStorage.setItem('rebanho_sitio', JSON.stringify(rebanho));
+        } catch (err) {
+            alert("O armazenamento local está cheio. Exclua registros antigos ou fotos desnecessárias.");
+            return;
+        }
+
+        limparFormulario();
+        atualizarTabela(campoBusca.value);
+    });
+
+    campoBusca.addEventListener('input', (e) => {
+        atualizarTabela(e.target.value);
+    });
+
+    atualizarTabela();
+</script>
+
+</body>
+</html>
